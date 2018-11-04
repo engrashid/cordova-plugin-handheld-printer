@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-print",
+  "version": "0.1.0",
+  "description": "Print wrapper plugin",
+  "cordova": {
+    "id": "cordova-plugin-print",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "rashid",
+  "license": "ISC"
+}
