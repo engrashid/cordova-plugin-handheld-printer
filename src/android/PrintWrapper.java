@@ -160,11 +160,15 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                     textSetting.setBold(SettingEnum.Disable);
                     textSetting.setDoubleHeight(SettingEnum.Disable);
                     textSetting.setDoubleWidth(SettingEnum.Disable);
+                    
                     escCmd.append(escCmd.getTextCmd(textSetting, "+0000000000"));
 
                     escCmd.append(escCmd.getLFCRCmd());
                     textSetting.setUnderline(SettingEnum.Enable);
                     escCmd.append(escCmd.getTextCmd(textSetting, "3123 1233 1231 2131"));
+
+                    escCmd.append(escCmd.getLFCRCmd());
+                    textSetting.setUnderline(SettingEnum.Enable);
                     escCmd.append(escCmd.getTextCmd(textSetting, "wearegood@payonmobi.com"));
 
                     escCmd.append(escCmd.getLFCRCmd());
