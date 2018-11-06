@@ -42,6 +42,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
     private Object configObj;
     private PrinterPowerUtil printerPowerUtil;//To switch AP02 printer power.
     private String test = "intializw";
+    
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         Context context=this.cordova.getActivity().getApplicationContext();
@@ -51,59 +52,18 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
         configObj = new SerialPortConfigBean().getDefaultConfig();
         this.connectSerialPort((SerialPortConfigBean) configObj);
         printerPowerUtil = new PrinterPowerUtil(context);
-        //BaseApplication.instance.setCurrentCmdType(MainActivity.CMD_ESC);
-        // printerFactory = new ThermalPrinterFactory();
-        //  rtPrinter = printerFactory.create();
-        //  PrinterObserverManager.getInstance().add(this);
-        //  configObj = new SerialPortConfigBean().getDefaultConfig();
-        // printerPowerUtil = new PrinterPowerUtil(this);
      } 
  
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("coolMethod")) {
-            String message = args.getString(0);
-            this.coolMethod(message, callbackContext);
-            return true;
-        }else if(action.equals("myMethod")){
-            String message = args.getString(0);
-            this.myMethod(message, callbackContext);
-            return true;
-        }else if(action.equals("printMethod")){
+       
+        if(action.equals("printMethod")){
             String message = args.getString(0);
                 this.printReceipt(message, callbackContext);
                 return true;
         }
         return false;
-    }
-
-    private void coolMethod(String message, CallbackContext callbackContext) {
-        if (message != null && message.length() > 0) {
-            
-             Context context=this.cordova.getActivity().getApplicationContext(); 
-             printerFactory = new ThermalPrinterFactory();
-            rtPrinter = printerFactory.create();
-            PrinterObserverManager.getInstance().add(this);
-            configObj = new SerialPortConfigBean().getDefaultConfig();
-            this.connectSerialPort((SerialPortConfigBean) configObj);
-            printerPowerUtil = new PrinterPowerUtil(context);
-            //callbackContext.success("printer code working!!");
-            // this.escSelftestPrint();
-            callbackContext.success(test);
-        } else {
-            callbackContext.error("Expected one non-empty string argument.");
-        }
-    }
-
-    private void myMethod(String message, CallbackContext callbackContext) {
-        //showToast("I am a message displayed by android toast");
-        //webView.loadUrl("javascript:console.log('hello');");
-        if (message != null && message.length() > 0) {
-            callbackContext.success("Java Method Callback");
-        } else {
-            callbackContext.error("Expected one non-empty string argument.");
-        }
     }
 
      /**
