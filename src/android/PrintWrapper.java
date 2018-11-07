@@ -30,11 +30,12 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import static com.rt.printerlibrary.enumerate.CommonEnum.ALIGN_MIDDLE;
 
-/**
- * This class echoes a string called from JavaScript.
- */
+
 public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
 
     private RTPrinter rtPrinter = null;
@@ -59,8 +60,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
        
         if(action.equals("printMethod")){
-            String message = args.getString(0);
-                this.printReceipt(message, callbackContext);
+                this.printReceipt(args, callbackContext);
                 return true;
         }
         return false;
@@ -95,51 +95,66 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
         }
     }
 
-    private void printReceipt(String message, CallbackContext callbackContext) {
+    private void printReceipt(JSONArray std, CallbackContext callbackContext) {
+        JSONArray myjsonarray = std;
+        // JSONObject jObject = new JSONObject(std);
+        // JSONArray myjsonarray = jObject.getJSONArray(0);
         new Thread(new Runnable() {
+            JSONArray rceiptdata;
+            {
+                try{
+                    this.rceiptdata = myjsonarray.getJSONArray(0);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage().toString());
+                }
+            }
+
             @Override
             public void run() {
                 try {
-                    CmdFactory escFac = new EscFactory();
-                    Cmd escCmd = escFac.create();
-                    escCmd.setChartsetName("UTF-8");
-                    TextSetting textSetting = new TextSetting();
-                    textSetting.setAlign(ALIGN_MIDDLE);//对齐方式-左对齐，居中，右对齐
-                    textSetting.setBold(SettingEnum.Enable);//加粗
-                    textSetting.setUnderline(SettingEnum.Disable);//下划线
-                    textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
-                    textSetting.setDoubleHeight(SettingEnum.Enable);//倍高
-                    textSetting.setDoubleWidth(SettingEnum.Enable);//倍宽
-                    textSetting.setItalic(SettingEnum.Disable);//斜体
-                    textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
-                    escCmd.append(escCmd.getHeaderCmd());//初始化
-                    escCmd.append(escCmd.getTextCmd(textSetting, "Wow"));
-                    escCmd.append(escCmd.getLFCRCmd());//回车换行
+                   CmdFactory escFac = new EscFactory();
+                   Cmd escCmd = escFac.create();
+                   escCmd.setChartsetName("UTF-8");
+                    for(int i = 0; i < this.rceiptdata.length(); i++)
+                    {
+                        TextSetting textSetting = new TextSetting();
+                        textSetting.setAlign(ALIGN_MIDDLE);//对齐方式-左对齐，居中，右对齐
+                        textSetting.setBold(SettingEnum.Enable);//加粗
+                        textSetting.setUnderline(SettingEnum.Disable);//下划线
+                        textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
+                        textSetting.setDoubleHeight(SettingEnum.Enable);//倍高
+                        textSetting.setDoubleWidth(SettingEnum.Enable);//倍宽
+                        textSetting.setItalic(SettingEnum.Disable);//斜体
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
+                        escCmd.append(escCmd.getHeaderCmd());//初始化
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("name")));
+                        escCmd.append(escCmd.getLFCRCmd());//回车换行
 
-                    textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
-                    textSetting.setBold(SettingEnum.Disable);
-                    textSetting.setDoubleHeight(SettingEnum.Disable);
-                    textSetting.setDoubleWidth(SettingEnum.Disable);
-                    
-                    escCmd.append(escCmd.getTextCmd(textSetting, "+0000000000"));
+                        // textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
+                        // textSetting.setBold(SettingEnum.Disable);
+                        // textSetting.setDoubleHeight(SettingEnum.Disable);
+                        // textSetting.setDoubleWidth(SettingEnum.Disable);
+                        
+                        // escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("age")));
 
-                    escCmd.append(escCmd.getLFCRCmd());
-                    textSetting.setUnderline(SettingEnum.Enable);
-                    escCmd.append(escCmd.getTextCmd(textSetting, "3123 1233 1231 2131"));
+                        // escCmd.append(escCmd.getLFCRCmd());
+                        // textSetting.setUnderline(SettingEnum.Enable);
+                        // escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("name")));
 
-                    escCmd.append(escCmd.getLFCRCmd());
-                    textSetting.setUnderline(SettingEnum.Enable);
-                    escCmd.append(escCmd.getTextCmd(textSetting, "wearegood@payonmobi.com"));
+                        // escCmd.append(escCmd.getLFCRCmd());
+                        // textSetting.setUnderline(SettingEnum.Enable);
+                        // escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("age")));
 
-                    escCmd.append(escCmd.getLFCRCmd());
-                    escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
 
-                    escCmd.append(escCmd.getLFCRCmd());
-                    escCmd.append(escCmd.getLFCRCmd());
-                    escCmd.append(escCmd.getLFCRCmd());
-
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                    }
                     rtPrinter.writeMsg(escCmd.getAppendCmds());
-                    callbackContext.success("Printing  complete");
+                    callbackContext.success("Print completed");
                 } catch (Exception e) {
                     e.printStackTrace();
                     callbackContext.error(e.getMessage().toString());
