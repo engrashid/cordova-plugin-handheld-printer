@@ -101,6 +101,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
         // JSONArray myjsonarray = jObject.getJSONArray(0);
         new Thread(new Runnable() {
             JSONArray rceiptdata;
+            JSONArray item;
             {
                 try{
                     this.rceiptdata = myjsonarray.getJSONArray(0);
@@ -128,24 +129,57 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         textSetting.setItalic(SettingEnum.Disable);//斜体
                         textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
                         escCmd.append(escCmd.getHeaderCmd());//初始化
-                        escCmd.append(escCmd.getTextCmd(textSetting, "Spy tech"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
+                        escCmd.append(escCmd.getLFCRCmd());//回车换
                         // escCmd.append(escCmd.getLFCRCmd());//回车换行
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
-                        // textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
-                        // textSetting.setBold(SettingEnum.Disable);
-                        // textSetting.setDoubleHeight(SettingEnum.Disable);
-                        // textSetting.setDoubleWidth(SettingEnum.Disable);
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address")));
+
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address1")));
                         
-                        // escCmd.append(escCmd.getTextCmd(textSetting, "spy tech"));
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("postcode")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactionnumber")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactiondate")));
+                        this.item = this.rceiptdata.getJSONObject(i).getJSONArray("item");
+                        for(int j = 0; i < this.item.length(); i++)
+                        {
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("networkname")));
 
-                        // escCmd.append(escCmd.getLFCRCmd());
-                        // textSetting.setUnderline(SettingEnum.Enable);
-                        // escCmd.append(escCmd.getTextCmd(textSetting, "address 1"));
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountreceive")));
 
-                        // escCmd.append(escCmd.getLFCRCmd());
-                        // textSetting.setUnderline(SettingEnum.Enable);
-                        // escCmd.append(escCmd.getTextCmd(textSetting, "address2"));
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("pinserial")));
 
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("pincode")));
+
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("expirationdate")));
+
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("accessnumbers")));
+                        }
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
 
