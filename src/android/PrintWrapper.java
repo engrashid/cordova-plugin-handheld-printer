@@ -117,8 +117,8 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                    CmdFactory escFac = new EscFactory();
                    Cmd escCmd = escFac.create();
                    escCmd.setChartsetName("UTF-8");
-                    for(int i = 0; i < this.rceiptdata.length(); i++)
-                    {
+                    // for(int i = 0; i < this.rceiptdata.length(); i++)
+                    // {
                         TextSetting textSetting = new TextSetting();
                         textSetting.setAlign(ALIGN_MIDDLE);//对齐方式-左对齐，居中，右对齐
                         textSetting.setBold(SettingEnum.Enable);//加粗
@@ -130,13 +130,8 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
                         escCmd.append(escCmd.getHeaderCmd());//初始化
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
-                        escCmd.append(escCmd.getLFCRCmd());//回车换行
-
-                        textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
-                        textSetting.setBold(SettingEnum.Disable);
-                        textSetting.setDoubleHeight(SettingEnum.Disable);
-                        textSetting.setDoubleWidth(SettingEnum.Disable);
-                        
+                        escCmd.append(escCmd.getLFCRCmd());//回车换
+                        // escCmd.append(escCmd.getLFCRCmd());//回车换行
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
                         escCmd.append(escCmd.getLFCRCmd());
@@ -191,7 +186,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
-                    }
+                    // }
                     rtPrinter.writeMsg(escCmd.getAppendCmds());
                     callbackContext.success("Print completed");
                 } catch (Exception e) {
