@@ -155,10 +155,10 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         escCmd.append(escCmd.getLFCRCmd());//回车换行
 
                         textSetting.setCpclFontSize(100);
-                        textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);
                         textSetting.setBold(SettingEnum.Disable);
                         textSetting.setDoubleHeight(SettingEnum.Disable);
-                        textSetting.setDoubleWidth(SettingEnum.Enable);
+                        textSetting.setDoubleWidth(SettingEnum.Disable);
                         
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
@@ -265,11 +265,11 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
                         escCmd.append(escCmd.getLFCRCmd());//回车换行
 
-                        textSetting.setCpclFontSize(100);
+                        textSetting.setCpclFontSize(200);
                         textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
                         textSetting.setBold(SettingEnum.Disable);
                         textSetting.setDoubleHeight(SettingEnum.Disable);
-                        textSetting.setDoubleWidth(SettingEnum.Enable);
+                        textSetting.setDoubleWidth(SettingEnum.Disable);
                         
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
