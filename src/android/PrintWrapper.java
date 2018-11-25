@@ -266,7 +266,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         escCmd.append(escCmd.getLFCRCmd());//回车换行
 
                         textSetting.setCpclFontSize(200);
-                        textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);
                         textSetting.setBold(SettingEnum.Disable);
                         textSetting.setDoubleHeight(SettingEnum.Disable);
                         textSetting.setDoubleWidth(SettingEnum.Disable);
