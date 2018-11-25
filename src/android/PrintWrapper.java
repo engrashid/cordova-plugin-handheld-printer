@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import static com.rt.printerlibrary.enumerate.CommonEnum.ALIGN_MIDDLE;
+import static com.rt.printerlibrary.enumerate.CommonEnum.ALIGN_LEFT;
 
 
 public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
@@ -42,8 +43,7 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
     private PrinterFactory printerFactory;
     private Object configObj;
     private PrinterPowerUtil printerPowerUtil;//To switch AP02 printer power.
-    private String test = "intializw";
-    
+    private Boolean connected = false;
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         Context context=this.cordova.getActivity().getApplicationContext();
@@ -51,8 +51,8 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
         rtPrinter = printerFactory.create();
         PrinterObserverManager.getInstance().add(this);
         configObj = new SerialPortConfigBean().getDefaultConfig();
-        this.connectSerialPort((SerialPortConfigBean) configObj);
         printerPowerUtil = new PrinterPowerUtil(context);
+        connect();
      } 
  
 
@@ -63,6 +63,21 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                 this.printReceipt(args, callbackContext);
                 return true;
         }
+
+        if(action.equals("printIntlMethod")){
+                this.printIntltopupReceipt(args, callbackContext);
+                return true;
+        }
+
+        
+        //   if(action.equals("connectMethod")){
+        //         this.connect(callbackContext);
+        //         return true;
+        // }
+        //   if(action.equals("checkConnectMethod")){
+        //         this.checkConnect(callbackContext);
+        //         return true;
+        // }
         return false;
     }
 
@@ -79,15 +94,14 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
     
     @Override
     public void printerObserverCallback(final PrinterInterface printerInterface, final int state) {
-        test = "print ovserver inserted";
         switch (state) {
             case CommonEnum.CONNECT_STATE_SUCCESS:
-                test = "print connected";
+                connected = true;
                 rtPrinter.setPrinterInterface(printerInterface);
                 //BaseApplication.getInstance().setRtPrinter(rtPrinter);
                 break;
             case CommonEnum.CONNECT_STATE_INTERRUPTED:
-                test = "print interrepted";
+                connected = false;
                // BaseApplication.getInstance().setRtPrinter(null);
                 break;
             default:
@@ -95,7 +109,15 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
         }
     }
 
+    private void connect() {
+       
+        connectSerialPort((SerialPortConfigBean) configObj);
+        printerPowerUtil.setPrinterPower(true);
+        // callbackContext.success(srconfig);
+    }
+
     private void printReceipt(JSONArray std, CallbackContext callbackContext) {
+   
         JSONArray myjsonarray = std;
         // JSONObject jObject = new JSONObject(std);
         // JSONArray myjsonarray = jObject.getJSONArray(0);
@@ -117,10 +139,10 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                    CmdFactory escFac = new EscFactory();
                    Cmd escCmd = escFac.create();
                    escCmd.setChartsetName("UTF-8");
-                    // for(int i = 0; i < this.rceiptdata.length(); i++)
-                    // {
+                    for(int i = 0; i < this.rceiptdata.length(); i++)
+                    {
                         TextSetting textSetting = new TextSetting();
-                        textSetting.setAlign(ALIGN_MIDDLE);//对齐方式-左对齐，居中，右对齐
+                        textSetting.setAlign(ALIGN_LEFT);//对齐方式-左对齐，居中，右对齐
                         textSetting.setBold(SettingEnum.Enable);//加粗
                         textSetting.setUnderline(SettingEnum.Disable);//下划线
                         textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
@@ -130,8 +152,14 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
                         escCmd.append(escCmd.getHeaderCmd());//初始化
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
-                        escCmd.append(escCmd.getLFCRCmd());//回车换
-                        // escCmd.append(escCmd.getLFCRCmd());//回车换行
+                        escCmd.append(escCmd.getLFCRCmd());//回车换行
+
+                        textSetting.setCpclFontSize(100);
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
+                        textSetting.setBold(SettingEnum.Disable);
+                        textSetting.setDoubleHeight(SettingEnum.Disable);
+                        textSetting.setDoubleWidth(SettingEnum.Enable);
+                        
                         escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
                         escCmd.append(escCmd.getLFCRCmd());
@@ -186,53 +214,142 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
-                    // }
+                    }
                     rtPrinter.writeMsg(escCmd.getAppendCmds());
-                    callbackContext.success("Print completed");
+                    callbackContext.success("Print done");
                 } catch (Exception e) {
                     e.printStackTrace();
                     callbackContext.error(e.getMessage().toString());
-                } 
+                }
             }
         }).start();
     }
 
-    // public void printTemplate() {
-    //                 CmdFactory escFac = new EscFactory();
-    //                 Cmd escCmd = escFac.create();
-    //                 escCmd.setChartsetName("UTF-8");
-    //                 TextSetting textSetting = new TextSetting();
-    //                 textSetting.setAlign(ALIGN_MIDDLE);//对齐方式-左对齐，居中，右对齐
-    //                 textSetting.setBold(SettingEnum.Enable);//加粗
-    //                 textSetting.setUnderline(SettingEnum.Disable);//下划线
-    //                 textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
-    //                 textSetting.setDoubleHeight(SettingEnum.Enable);//倍高
-    //                 textSetting.setDoubleWidth(SettingEnum.Enable);//倍宽
-    //                 textSetting.setItalic(SettingEnum.Disable);//斜体
-    //                 textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
-    //                 escCmd.append(escCmd.getHeaderCmd());//初始化
-    //                 escCmd.append(escCmd.getTextCmd(textSetting, "Wow"));
-    //                 escCmd.append(escCmd.getLFCRCmd());//回车换行
+    private void printIntltopupReceipt(JSONArray std, CallbackContext callbackContext) {
+		//if(connected == false){
+		//	callbackContext.error("error");
+		//}
+        JSONArray myjsonarray = std;
+        // JSONObject jObject = new JSONObject(std);
+        // JSONArray myjsonarray = jObject.getJSONArray(0);
+        new Thread(new Runnable() {
+            JSONArray rceiptdata;
+            JSONArray item;
+            {
+                try{
+                    this.rceiptdata = myjsonarray.getJSONArray(0);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage().toString());
+                }
+            }
 
-    //                 textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
-    //                 textSetting.setBold(SettingEnum.Disable);
-    //                 textSetting.setDoubleHeight(SettingEnum.Disable);
-    //                 textSetting.setDoubleWidth(SettingEnum.Disable);
-    //                 escCmd.append(escCmd.getTextCmd(textSetting, "+0000000000"));
+            @Override
+            public void run() {
+                try {
+                   CmdFactory escFac = new EscFactory();
+                   Cmd escCmd = escFac.create();
+                   escCmd.setChartsetName("UTF-8");
+                    for(int i = 0; i < this.rceiptdata.length(); i++)
+                    {
+                        TextSetting textSetting = new TextSetting();
+                        textSetting.setAlign(ALIGN_LEFT);//对齐方式-左对齐，居中，右对齐
+                        textSetting.setBold(SettingEnum.Enable);//加粗
+                        textSetting.setUnderline(SettingEnum.Disable);//下划线
+                        textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
+                        textSetting.setDoubleHeight(SettingEnum.Enable);//倍高
+                        textSetting.setDoubleWidth(SettingEnum.Enable);//倍宽
+                        textSetting.setItalic(SettingEnum.Disable);//斜体
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
+                        escCmd.append(escCmd.getHeaderCmd());//初始化
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
+                        escCmd.append(escCmd.getLFCRCmd());//回车换行
 
-    //                 escCmd.append(escCmd.getLFCRCmd());
-    //                 textSetting.setUnderline(SettingEnum.Enable);
-    //                 escCmd.append(escCmd.getTextCmd(textSetting, "3123 1233 1231 2131"));
-    //                 escCmd.append(escCmd.getTextCmd(textSetting, "wearegood@payonmobi.com"));
+                        textSetting.setCpclFontSize(100);
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Enable);
+                        textSetting.setBold(SettingEnum.Disable);
+                        textSetting.setDoubleHeight(SettingEnum.Disable);
+                        textSetting.setDoubleWidth(SettingEnum.Enable);
+                        
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
 
-    //                 escCmd.append(escCmd.getLFCRCmd());
-    //                 escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address")));
 
-    //                 escCmd.append(escCmd.getLFCRCmd());
-    //                 escCmd.append(escCmd.getLFCRCmd());
-    //                 escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address1")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("postcode")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactionnumber")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactiondate")));
+						
+						escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, "Int'l Mobile Topup"));
+                        this.item = this.rceiptdata.getJSONObject(i).getJSONArray("item");
+                        for(int j = 0; i < this.item.length(); i++)
+                        {
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("networkname")));
 
-    //                 rtPrinter.writeMsg(escCmd.getAppendCmds());
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountpurchase")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountcharge")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountreceive")));
+							
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("taxdeducted")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("moblilenumber")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("topupamount")));
+                        }
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                    }
+                    rtPrinter.writeMsg(escCmd.getAppendCmds());
+                    callbackContext.success("Print done");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage().toString());
+                }
+            }
+        }).start();
+    }
+
+    // private void doDisConnect() {
+    //     if (rtPrinter != null && rtPrinter.getPrinterInterface() != null) {
+    //         rtPrinter.disConnect();
+    //     }
+    //     printerPowerUtil.setPrinterPower(false);//turn printer power off.
+    //     setPrintEnable(false);
     // }
 
     private void connectSerialPort(SerialPortConfigBean serialPortConfigBean) {
