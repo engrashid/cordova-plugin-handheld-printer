@@ -110,11 +110,11 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
     }
 
     private void connect() {
-       
-        connectSerialPort((SerialPortConfigBean) configObj);
-        printerPowerUtil.setPrinterPower(true);
-        // callbackContext.success(srconfig);
+            connectSerialPort((SerialPortConfigBean) configObj);
+            printerPowerUtil.setPrinterPower(true);
     }
+
+    
 
     private void printReceipt(JSONArray std, CallbackContext callbackContext) {
    
@@ -208,6 +208,17 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                             textSetting.setUnderline(SettingEnum.Enable);
                             escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("accessnumbers")));
                         }
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, "________________________________"));
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getTextCmd(textSetting, "Pins/Voucher bought at this location cannot be exchanged or refunded."));
+                        escCmd.append(escCmd.getTextCmd(textSetting, " Please contact relevant operator customer service alternatively email your"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "query with this receipt to sales@ipayon.com"));
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
 
@@ -327,6 +338,15 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                             textSetting.setUnderline(SettingEnum.Enable);
                             escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("topupamount")));
                         }
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, "________________________________"));
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getTextCmd(textSetting, "Supplier of the International Mobile Topup/credit & Bill Payment are based outside the EU and mobile"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "credit transferred to your  recipient are meant to be used and enjoyed outside EU only. iPayOn and nominated company are"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "only acting as cash collection and marketing agency for such suppliers/operators and not the seller of such services to"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "you or retailers. These services are strictly for recipients based outside EU"));
                         escCmd.append(escCmd.getLFCRCmd());
                         escCmd.append(escCmd.getLFCRCmd());
 
