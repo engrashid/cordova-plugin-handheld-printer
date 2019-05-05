@@ -195,10 +195,18 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                             escCmd.append(escCmd.getLFCRCmd());
                             textSetting.setUnderline(SettingEnum.Enable);
                             escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("pinserial")));
+                            
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, "**************************")); 
 
                             escCmd.append(escCmd.getLFCRCmd());
                             textSetting.setUnderline(SettingEnum.Enable);
                             escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("pincode")));
+
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, "**************************"));
 
                             escCmd.append(escCmd.getLFCRCmd());
                             textSetting.setUnderline(SettingEnum.Enable);
