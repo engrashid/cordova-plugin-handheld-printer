@@ -69,6 +69,11 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
                 return true;
         }
 
+        if(action.equals("billpaymentMethod")){
+                this.printBillPaymentReceipt(args, callbackContext);
+                return true;
+        }
+
         
         //   if(action.equals("connectMethod")){
         //         this.connect(callbackContext);
@@ -345,6 +350,138 @@ public class PrintWrapper extends CordovaPlugin implements PrinterObserver{
 							escCmd.append(escCmd.getLFCRCmd());
                             textSetting.setUnderline(SettingEnum.Enable);
                             escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("topupamount")));
+                        }
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, "________________________________"));
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getTextCmd(textSetting, "Supplier of the International Mobile Topup/credit & Bill Payment are based outside the EU and mobile"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "credit transferred to your  recipient are meant to be used and enjoyed outside EU only. iPayOn and nominated company are"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "only acting as cash collection and marketing agency for such suppliers/operators and not the seller of such services to"));
+                        escCmd.append(escCmd.getTextCmd(textSetting, "you or retailers. These services are strictly for recipients based outside EU"));
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                        escCmd.append(escCmd.getLFCRCmd());
+                    }
+                    rtPrinter.writeMsg(escCmd.getAppendCmds());
+                    callbackContext.success("Print done");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage().toString());
+                }
+            }
+        }).start();
+    }
+
+    private void printBillPaymentReceipt(JSONArray std, CallbackContext callbackContext) {
+		//if(connected == false){
+		//	callbackContext.error("error");
+		//}
+        JSONArray myjsonarray = std;
+        // JSONObject jObject = new JSONObject(std);
+        // JSONArray myjsonarray = jObject.getJSONArray(0);
+        new Thread(new Runnable() {
+            JSONArray rceiptdata;
+            JSONArray item;
+            {
+                try{
+                    this.rceiptdata = myjsonarray.getJSONArray(0);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage().toString());
+                }
+            }
+
+            @Override
+            public void run() {
+                try {
+                   CmdFactory escFac = new EscFactory();
+                   Cmd escCmd = escFac.create();
+                   escCmd.setChartsetName("UTF-8");
+                    for(int i = 0; i < this.rceiptdata.length(); i++)
+                    {
+                        TextSetting textSetting = new TextSetting();
+                        textSetting.setAlign(ALIGN_LEFT);//对齐方式-左对齐，居中，右对齐
+                        textSetting.setBold(SettingEnum.Enable);//加粗
+                        textSetting.setUnderline(SettingEnum.Disable);//下划线
+                        textSetting.setIsAntiWhite(SettingEnum.Disable);//反白
+                        textSetting.setDoubleHeight(SettingEnum.Enable);//倍高
+                        textSetting.setDoubleWidth(SettingEnum.Enable);//倍宽
+                        textSetting.setItalic(SettingEnum.Disable);//斜体
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);//小字体
+                        escCmd.append(escCmd.getHeaderCmd());//初始化
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("businessname")));
+                        escCmd.append(escCmd.getLFCRCmd());//回车换行
+
+                        textSetting.setCpclFontSize(200);
+                        textSetting.setIsEscSmallCharactor(SettingEnum.Disable);
+                        textSetting.setBold(SettingEnum.Disable);
+                        textSetting.setDoubleHeight(SettingEnum.Disable);
+                        textSetting.setDoubleWidth(SettingEnum.Disable);
+                        
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("shopname")));
+
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address")));
+
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("address1")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("postcode")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactionnumber")));
+                        
+                        escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, this.rceiptdata.getJSONObject(i).getString("transactiondate")));
+						
+						escCmd.append(escCmd.getLFCRCmd());
+                        textSetting.setUnderline(SettingEnum.Enable);
+                        escCmd.append(escCmd.getTextCmd(textSetting, "Bill Payment Service"));
+                        this.item = this.rceiptdata.getJSONObject(i).getJSONArray("item");
+                        for(int j = 0; i < this.item.length(); i++)
+                        {
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("billername")));
+
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountpurchase")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountcharge")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("paymentamount")));
+
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("amountreceive")));
+							
+                            escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("taxdeducted")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("billingaccountnumber")));
+							
+							escCmd.append(escCmd.getLFCRCmd());
+                            textSetting.setUnderline(SettingEnum.Enable);
+                            escCmd.append(escCmd.getTextCmd(textSetting, this.item.getJSONObject(i).getString("billingtotalamount")));
                         }
                         escCmd.append(escCmd.getLFCRCmd());
                         textSetting.setUnderline(SettingEnum.Enable);
