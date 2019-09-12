@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-print" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-print" version="1.1.2" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>PrintWrapper</name>
     <js-module name="PrintWrapper" src="www/PrintWrapper.js">
         <clobbers target="cordova.plugins.PrintWrapper" />
@@ -15,5 +15,6 @@
         <source-file src="src/android/PrintWrapper.java" target-dir="src/cordova.plugin.print/PrintWrapper" />
         <lib-file src="src/android/libs/printer_library_ap02.jar"/>
         <resource-file src="src/android/libs/armeabi/libserial_port.so" target="jniLibs/armeabi/libserial_port.so" />
+        <resource-file src="src/android/libs/arm64-v8a/libserial_port.so" target="jniLibs/arm64-v8a/libserial_port.so" />
     </platform>
 </plugin>
